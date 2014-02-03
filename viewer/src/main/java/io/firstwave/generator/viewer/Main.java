@@ -28,6 +28,15 @@ public class Main {
 	private static List<Layer> layers;
 
 	public static void main(String args[]) throws Exception {
+		// take the menu bar off the jframe
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
+
+		// set the name of the application menu item
+		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Generator Viewer");
+
+		// set the look and feel
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
 		final JFrame frame = new JFrame("Generator Viewer");
 		form = new MainForm();
 		renderPanel = new RenderPanel();
