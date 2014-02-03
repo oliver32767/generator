@@ -62,7 +62,7 @@ public class LevelRenderer extends Renderer {
 
 		BufferedImage rv = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
 		try {
-			String res = properties.getProperty("render.bg");
+			String res = properties.getProperty("level.bg");
 			if (res != null) {
 				BufferedImage bg = ImageIO.read(ClassLoader.getSystemResourceAsStream(res));
 				int srcSize = (bg.getHeight() < bg.getWidth()) ? bg.getHeight() : bg.getWidth();
@@ -88,7 +88,7 @@ public class LevelRenderer extends Renderer {
 				gy = y - (size / 2);
 				gx = gx * (2.0f / size);
 				gy = gy * (2.0f / size);
-				value = normalize(value) * constrain(1.0f - gradient.get(gx, gy) + friendlyIntensity);
+				value = normalize(value) * constrain(gradient.get(gx, gy) + friendlyIntensity);
 				if (value > friendlyThresh)
 					layer.setRGB(x, y, color((float) value, 0.0f, 1.0f, 0.0f));
 			}
