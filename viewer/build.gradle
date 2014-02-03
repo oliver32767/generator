@@ -1,0 +1,17 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+sourceCompatibility = 1.5
+version = '1.0'
+mainClassName = 'io.firstwave.generator.viewer.Main'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile project(':library')
+    compile 'com.intellij:forms_rt:7.0.3'
+    compile 'gov.nih.imagej:imagej:1.47'
+}
