@@ -9,7 +9,7 @@ public class LevelConfiguration {
 	public static final String SEED = "seed";
 
 	private final Properties data;
-	
+
 	public LevelConfiguration(Properties data) {
 		this.data = data;
 	}
@@ -21,17 +21,17 @@ public class LevelConfiguration {
 	public String getString(String key) {
 		return getString(key, null);
 	}
-	
+
 	public String getString(String key, String defaultValue) {
 		return data.getProperty(key, defaultValue);
 	}
-	
+
 	public Integer getInteger(String key) {
 		return getInteger(key, null);
 	}
-	
+
 	public Integer getInteger(String key, Integer defaultValue) {
-		return (data.getProperty(key) != null) ? Integer.valueOf(data.getProperty(key)) : defaultValue; 
+		return (data.getProperty(key) != null) ? Integer.valueOf(data.getProperty(key)) : defaultValue;
 	}
 
 	public Float getFloat(String key) {

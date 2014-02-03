@@ -54,9 +54,4 @@ public abstract class Renderer {
 		if (d > 1.0f) return 1.0f;
 		return d;
 	}
-
-	protected double normalize(double v) {
-		return (v + 1) / 2f;
-	}
-
 }
