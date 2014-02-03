@@ -6,7 +6,7 @@ import java.util.Random;
  * Generates noise using the "classic" perlin generator
  *
  * @see SimplexNoiseGenerator "Improved" and faster version with slighly
- *     different results
+ *      different results
  */
 public class PerlinNoiseGenerator extends NoiseGenerator {
 	protected static final int grad3[][] = {{1, 1, 0}, {-1, 1, 0}, {1, -1, 0}, {-1, -1, 0},
@@ -164,8 +164,8 @@ public class PerlinNoiseGenerator extends NoiseGenerator {
 	 * Generates noise for the 1D coordinates using the specified number of
 	 * octaves and parameters
 	 *
-	 * @param x X-coordinate
-	 * @param octaves Number of octaves to use
+	 * @param x         X-coordinate
+	 * @param octaves   Number of octaves to use
 	 * @param frequency How much to alter the frequency by each octave
 	 * @param amplitude How much to alter the amplitude by each octave
 	 * @return Resulting noise
@@ -178,9 +178,9 @@ public class PerlinNoiseGenerator extends NoiseGenerator {
 	 * Generates noise for the 2D coordinates using the specified number of
 	 * octaves and parameters
 	 *
-	 * @param x X-coordinate
-	 * @param y Y-coordinate
-	 * @param octaves Number of octaves to use
+	 * @param x         X-coordinate
+	 * @param y         Y-coordinate
+	 * @param octaves   Number of octaves to use
 	 * @param frequency How much to alter the frequency by each octave
 	 * @param amplitude How much to alter the amplitude by each octave
 	 * @return Resulting noise
@@ -193,10 +193,10 @@ public class PerlinNoiseGenerator extends NoiseGenerator {
 	 * Generates noise for the 3D coordinates using the specified number of
 	 * octaves and parameters
 	 *
-	 * @param x X-coordinate
-	 * @param y Y-coordinate
-	 * @param z Z-coordinate
-	 * @param octaves Number of octaves to use
+	 * @param x         X-coordinate
+	 * @param y         Y-coordinate
+	 * @param z         Z-coordinate
+	 * @param octaves   Number of octaves to use
 	 * @param frequency How much to alter the frequency by each octave
 	 * @param amplitude How much to alter the amplitude by each octave
 	 * @return Resulting noise

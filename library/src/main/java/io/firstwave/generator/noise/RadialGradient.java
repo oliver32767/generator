@@ -5,6 +5,7 @@ package io.firstwave.generator.noise;
  */
 public class RadialGradient {
 	private final Curve curve;
+
 	public RadialGradient(Curve curve) {
 		this.curve = curve;
 	}
@@ -12,6 +13,7 @@ public class RadialGradient {
 	/**
 	 * Calculate the value of the gradient at the given position
 	 * The gradient is assumed to have a radius of 1.0f centered on 0.0f, 0.0f
+	 *
 	 * @param x
 	 * @param y
 	 * @return
@@ -23,6 +25,7 @@ public class RadialGradient {
 	/**
 	 * Calculate the value of the gradient at the given position using the given curve
 	 * The gradient is assumed to have a radius of 1.0f centered on 0.0f, 0.0f
+	 *
 	 * @param curve
 	 * @param x
 	 * @param y

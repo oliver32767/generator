@@ -8,6 +8,7 @@ import java.util.Map;
  */
 public abstract class Curve {
 	private static final float PI = 3.14159265f;
+
 	public abstract double calculate(double t);
 
 	public static final Curve NONE = new Curve() {
@@ -29,7 +30,7 @@ public abstract class Curve {
 
 		@Override
 		public double calculate(double t) {
-			return (t-=1)*t*t + 1;
+			return (t -= 1) * t * t + 1;
 		}
 	};
 
@@ -44,7 +45,7 @@ public abstract class Curve {
 	public static final Curve SINE_INOUT = new Curve() {
 		@Override
 		public double calculate(double t) {
-			return -0.5f * ((float) Math.cos(PI*t) - 1);
+			return -0.5f * ((float) Math.cos(PI * t) - 1);
 		}
 	};
 	private static final Map<String, Curve> lookupMap;
@@ -74,9 +75,11 @@ public abstract class Curve {
 
 	private static class InvertedCurve extends Curve {
 		private final Curve curve;
+
 		public InvertedCurve(Curve curve) {
 			this.curve = curve;
 		}
+
 		@Override
 		public double calculate(double t) {
 			return 1.0f + (-1.0f * calculateImpl(t));
