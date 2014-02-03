@@ -12,8 +12,8 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,6 +24,8 @@ public class Main {
 	private static MainForm form;
 	private static RenderPanel renderPanel;
 	private static MessageHandler messageHandler;
+	private static CheckBoxList layerList;
+	private static List<Layer> layers;
 
 	public static void main(String args[]) throws Exception {
 		final JFrame frame = new JFrame("Generator Viewer");
@@ -177,6 +179,20 @@ public class Main {
 			}
 		};
 
+		// layer list
+		layerList = new CheckBoxList();
+		layerList.setCallback(new CheckBoxList.Callback() {
+			@Override
+			public void onSelectionChanged(JCheckBox source) {
+				drawLayers();
+			}
+		});
+		layers = new ArrayList<Layer>();
+		updateLayerList();
+		form.getChecklist().setViewportView(layerList);
+		form.getSplitPane().setDividerLocation(form.getSplitPane().getSize().width - 200);
+		form.getSplitPane().setResizeWeight(1.0);
+
 		doRender();
 	}
 
@@ -200,8 +216,9 @@ public class Main {
 					messageHandler.setMessage(String.format(p.getProperty("ui.working", "%s started..."), renderer.getClass().getSimpleName()));
 
 
-					BufferedImage img = getRenderer().render(p, messageHandler);
-					renderPanel.setImage(img);
+					layers = getRenderer().render(p, messageHandler);
+					updateLayerList();
+					drawLayers();
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -218,6 +235,34 @@ public class Main {
 			}
 		};
 		renderThread.start();
+	}
+
+	static void updateLayerList() {
+		Vector<JCheckBox> chks = new Vector<JCheckBox>();
+		JCheckBox chk;
+		for (int i = 0; i < layers.size(); i++) {
+			chk = new JCheckBox(layers.get(i).getName());
+			if (i >= layerList.getModel().getSize()) {
+				chk.setSelected(true);
+			} else {
+				chk.setSelected(layerList.isSelected(i));
+			}
+			chks.add(chk);
+		}
+		layerList.setListData(chks);
+	}
+
+	static void drawLayers() {
+		// step through each layer and draw one on top of the other. index 0 = bottom layer
+		if (layers == null || layers.size() == 0) return;
+		BufferedImage img = new BufferedImage(layers.get(0).getWidth(), layers.get(0).getHeight(), layers.get(0).getType());
+		Graphics g = img.getGraphics();
+		for (int i = 0; i < layers.size(); i++) {
+			if (layerList.isSelected(i)) {
+				g.drawImage(layers.get(i), 0, 0, null);
+			}
+		}
+		renderPanel.setImage(img);
 	}
 
 	static Renderer getRenderer() {

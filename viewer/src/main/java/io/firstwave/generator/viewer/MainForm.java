@@ -21,6 +21,8 @@ public class MainForm {
 	private JButton resetButton;
 	private JComboBox rendererSelector;
 	private JTextField message;
+	private JScrollPane checklist;
+	private JSplitPane splitPane;
 
 	public JPanel getRoot() {
 		return root;
@@ -62,6 +64,14 @@ public class MainForm {
 		return rendererSelector;
 	}
 
+	public JScrollPane getChecklist() {
+		return checklist;
+	}
+
+	public JSplitPane getSplitPane() {
+		return splitPane;
+	}
+
 	private void createUIComponents() {
 		// TODO: place custom component creation code here
 	}
@@ -88,14 +98,18 @@ public class MainForm {
 		final JPanel panel1 = new JPanel();
 		panel1.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
 		tabbedPane.addTab("Output", panel1);
-		scrollPane = new JScrollPane();
-		panel1.add(scrollPane, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
 		resetZoom = new JButton();
 		resetZoom.setText("1.00");
 		resetZoom.setToolTipText("click to reset scale");
 		panel1.add(resetZoom, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 1, false));
 		zoom = new JSlider();
 		panel1.add(zoom, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		splitPane = new JSplitPane();
+		panel1.add(splitPane, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
+		scrollPane = new JScrollPane();
+		splitPane.setLeftComponent(scrollPane);
+		checklist = new JScrollPane();
+		splitPane.setRightComponent(checklist);
 		final JPanel panel2 = new JPanel();
 		panel2.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
 		tabbedPane.addTab("Config", panel2);

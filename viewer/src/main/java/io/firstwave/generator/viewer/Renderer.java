@@ -1,6 +1,6 @@
 package io.firstwave.generator.viewer;
 
-import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -30,7 +30,7 @@ public abstract class Renderer {
 		return messageHandler;
 	}
 
-	public abstract BufferedImage render(Properties properties, MessageHandler messageHandler);
+	public abstract List<Layer> render(Properties properties, MessageHandler messageHandler);
 
 	protected int color(float a, float r, float g, float b) {
 		int aa = Math.round(255 * constrain(a));

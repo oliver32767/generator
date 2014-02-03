@@ -10,6 +10,8 @@ import io.firstwave.generator.noise.RadialGradient;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -22,8 +24,7 @@ public class LevelRenderer extends Renderer {
 	}
 
 	@Override
-	public BufferedImage render(Properties properties, MessageHandler messageHandler) {
-
+	public List<Layer> render(Properties properties, MessageHandler messageHandler) {
 		LevelConfiguration config = new LevelConfiguration(properties);
 
 		// Level Generation
@@ -60,20 +61,25 @@ public class LevelRenderer extends Renderer {
 		String valueCurve = config.getString("valueCurve", "none");
 		float valueAlpha = config.getFloat("valueAlpha", 0.5f);
 
-		BufferedImage rv = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+
+		List<Layer> layers = new ArrayList<Layer>();
+		Layer layer;
+
 		try {
 			String res = properties.getProperty("level.bg");
 			if (res != null) {
+				layer = new Layer("Background", size, size, BufferedImage.TYPE_INT_ARGB);
 				BufferedImage bg = ImageIO.read(ClassLoader.getSystemResourceAsStream(res));
 				int srcSize = (bg.getHeight() < bg.getWidth()) ? bg.getHeight() : bg.getWidth();
-				rv.getGraphics().drawImage(bg, 0, 0, size, size, 0, 0, srcSize, srcSize, null);
+				layer.getGraphics().drawImage(bg, 0, 0, size, size, 0, 0, srcSize, srcSize, null);
+				layers.add(layer);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		BufferedImage layer = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
 
 		// FRIENDLY ////////////////////////////////////////////////////////////////////////////////////////////////////
+		layer = new Layer("Friendly", size, size, BufferedImage.TYPE_INT_ARGB);
 		float scale = size * friendlyScale;
 		double[][] noise = level.getMatrix(Level.FRIENDLY_MATRIX);
 
@@ -93,9 +99,10 @@ public class LevelRenderer extends Renderer {
 					layer.setRGB(x, y, color((float) value, 0.0f, 1.0f, 0.0f));
 			}
 		}
-		rv.getGraphics().drawImage(layer, 0 ,0, null);
+		layers.add(layer);
 
 		// HOSTILE /////////////////////////////////////////////////////////////////////////////////////////////////////
+		layer = new Layer("Hostile", size, size, BufferedImage.TYPE_INT_ARGB);
 		scale = size * hostileScale;
 		noise = level.getMatrix(Level.HOSTILE_MATRIX);
 
@@ -112,17 +119,17 @@ public class LevelRenderer extends Renderer {
 					layer.setRGB(x, y, color((float) value, 1.0f, 0.0f, 0.0f));
 			}
 		}
-		rv.getGraphics().drawImage(layer, 0 ,0, null);
+		layers.add(layer);
 
 
 		// ASTEROID ////////////////////////////////////////////////////////////////////////////////////////////////////
+		layer = new Layer("Asteroid", size, size, BufferedImage.TYPE_INT_ARGB);
 		scale = size * asteroidScale;
 		float oreThresh = (asteroidHi - asteroidLow) * oreDepth / 2; // ore depth gives us the depth we need to
 		// penetrate in to an asteroid region before we find asteroids,
 		// i.e. a depth of .9 means we need to penetrate at least 90% of the way to the center
 
 		noise = level.getMatrix(Level.ASTEROID_MATRIX);
-		layer = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
 		gradient = new RadialGradient(Curve.lookup(asteroidCurve));
 		for (int x = 0; x < size; x++ ) {
 			for (int y = 0; y < size; y++) {
@@ -142,9 +149,10 @@ public class LevelRenderer extends Renderer {
 				}
 			}
 		}
-		rv.getGraphics().drawImage(layer, 0 ,0, null);
+		layers.add(layer);
 
 		// VALUE //////////////////////////////////////////////////////////////////////////////////////////////////////
+		layer = new Layer("Value", size, size, BufferedImage.TYPE_INT_ARGB);
 		scale = size * valueScale;
 		noise = level.getMatrix(Level.VALUE_MATRIX);
 		gradient = new RadialGradient(Curve.lookup(valueCurve));
@@ -165,7 +173,7 @@ public class LevelRenderer extends Renderer {
 
 			}
 		}
-		rv.getGraphics().drawImage(layer, 0 ,0, null);
+		layers.add(layer);
 
 		long renderEnd = System.currentTimeMillis();
 
@@ -173,7 +181,7 @@ public class LevelRenderer extends Renderer {
 				Main.convertMillis(genEnd - genStart),
 				Main.convertMillis(renderEnd - renderStart),
 				Main.convertMillis(renderEnd - genStart)));
-		return rv;
+		return layers;
 	}
 
 }
