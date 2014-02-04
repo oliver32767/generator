@@ -4,51 +4,52 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Totally naive way of filtering out a matrix of noise data for matching points.
- * The best way to use this would be to cache the results,
- * because we have to check each and every individual point against matching conditions.
+ * Totally naive way of processing a two dimensional array of data. If the given predicate returns a value of true,
+ * then a point corresponding to the given x, y will be added to the list of matching points
  */
 public class PointProcessor {
-
 	public static List<Point> get(int w, int h, Predicate predicate) {
+		return get(0, 0, w, h, predicate);
+	}
+
+	public static List<Point> get(int x, int y, int w, int h, Predicate predicate) {
 		List<Point> points = new ArrayList<Point>();
-		float weight;
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < h; y++) {
-				weight = predicate.weigh(x, y);
-				if (weight > 0.0) {
-					points.add(new Point(x, y, weight));
-				}
+		for (int u = x; u < x + w; u++) {
+			for (int v = y; v < y + h; v++) {
+				if (predicate.match(u, v))
+					points.add(new Point(u, v));
+				if (predicate.isCanceled) break;
 			}
+			if (predicate.isCanceled) break;
 		}
 		return points;
 	}
 
-	public static class Point implements Comparable<Point> {
+	public static class Point {
 		public final int x, y;
-		public final float weight;
-		public Point(int x, int y, float weight) {
+		public Point(int x, int y) {
 			this.x = x;
 			this.y = y;
-			this.weight = weight;
-		}
-
-
-		@Override
-		public int compareTo(Point point) {
-			return Float.compare(this.x, point.x);
 		}
 	}
 
-	public static interface Predicate {
-		public static final float IGNORE = -1.0f;
+	public static abstract class Predicate {
+		boolean isCanceled = false;
 		/**
-		 * Assign a weight to a point at the given coordinates. Points with a weight <= 0.0 will be discarded.
+		 * Determine whether a point at the given coordinates matches specific conditions.
+		 * Matching points will be added to the list of returned points.
 		 * @param x
 		 * @param y
 		 * @return
 		 */
-		public float weigh(int x, int y);
+		public abstract boolean match(int x, int y);
+
+		/**
+		 * Calling this will cancel further processing. The Processor will still return the list of points matched up to this point.
+		 */
+		protected void cancel() {
+			isCanceled = true;
+		}
 	}
 
 }

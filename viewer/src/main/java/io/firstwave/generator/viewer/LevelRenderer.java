@@ -35,13 +35,18 @@ public class LevelRenderer extends Renderer {
 		int size = config.getInteger("size", 1024);
 
 
-		float asteroidLow = config.getFloat("asteroidLow", 0.1f);
-		float asteroidHi = config.getFloat("asteroidHi", 0.5f);
-		float oreDepth = config.getFloat("oreDepth", 0.9f);
+		final float asteroidLow = config.getFloat("asteroidLow", 0.1f);
+		final float asteroidHi = config.getFloat("asteroidHi", 0.5f);
+		final float oreDepth = config.getFloat("oreDepth", 0.9f);
 
-		float valueBracket = config.getFloat("valueBracket", 0.1f);
-		float valueAlpha = config.getFloat("valueAlpha", 0.5f);
+		final float valueBracket = config.getFloat("valueBracket", 0.1f);
+		final float valueAlpha = config.getFloat("valueAlpha", 0.5f);
 
+		final float enemyDensity = config.getFloat("enemyDensity", 2f);
+		final float asteroidDensity = config.getFloat("asteroidDensity", 3f);
+		final float oreValue = config.getFloat("oreValue", 0.5f);
+		final float oreDensity = config.getFloat("oreDensity", 1f);
+		final float oreThresh = (asteroidHi - asteroidLow) * oreDepth / 2; // ore depth gives us the depth we need to
 
 		List<Layer> layers = new ArrayList<Layer>();
 		Layer layer, altLayer;
@@ -80,8 +85,8 @@ public class LevelRenderer extends Renderer {
         layers.add(layer);
 
         layer = new Layer("Asteroid", size, size);
-        altLayer = new Layer("Ore", size, size);
-        float oreThresh = (asteroidHi - asteroidLow) * oreDepth / 2; // ore depth gives us the depth we need to
+        altLayer = new Layer("Ore Depth", size, size);
+
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
                 value = level.getInterpolation(Level.ASTEROID)[x][y];
@@ -113,101 +118,54 @@ public class LevelRenderer extends Renderer {
 		List<PointProcessor.Point> points;
 		int r;
 
+		// Render entities /////////////////////////////////////////////////////////////////////////////////////////////
+
 		layer = new Layer("Asteroids", size, size);
 		points = PointProcessor.get(size, size, new PointProcessor.Predicate() {
 			@Override
-			public float weigh(int x, int y) {
-				if (level.getInterpolation(Level.ASTEROID)[x][y] > 0.0f) {
-					return 1.0f;
-				} else {
-					return IGNORE;
-				}
+			public boolean match(int x, int y) {
+				return (level.getInterpolation(Level.ASTEROID)[x][y] > 0.0f);
 			}
 		});
-
-		Collections.shuffle(points, rand);
-		Collections.sort(points);
-
-		for (int i = 0; i < 3 * (float) points.size() / (float) size ; i++) {
+		for (int i = 0; i < asteroidDensity * (float) points.size() / (float) size ; i++) {
 			p = points.get(rand.nextInt(points.size() - 1));
 			r = rand.nextInt((int) (10 * (level.getInterpolation(Level.VALUE)[p.x][p.y] + 1)));
 			drawCircle(layer, p.x, p.y, r, Color.GRAY);
 		}
 		layers.add(layer);
 
-
 		layer = new Layer("Enemies", size, size);
 		points = PointProcessor.get(size, size, new PointProcessor.Predicate() {
 			@Override
-			public float weigh(int x, int y) {
-				if (level.getInterpolation(Level.HOSTILE)[x][y] > 0.0f) {
-					return (float) level.getInterpolation(Level.VALUE)[x][y];
-				}
-				return IGNORE;
+			public boolean match(int x, int y) {
+				return (level.getInterpolation(Level.HOSTILE)[x][y] > 0.0f);
 			}
 		});
-
-		// Compute the total weight of all items together
-		double totalWeight = 0.0d;
-		for (int i = 0; i < 2 * ((float) points.size() / size); i++) {
-			for (PointProcessor.Point point : points)
-			{
-				totalWeight += point.weight;
-			}
-			// Now choose a random item
-			int randomIndex = -1;
-			double random = rand.nextDouble() * totalWeight;
-			for (int ii = 0; i < points.size(); ++ii)
-			{
-				random -= points.get(ii).weight;
-				if (random <= 0.0d)
-				{
-					randomIndex = ii;
-					break;
-				}
-			}
-			PointProcessor.Point randomPoint = points.get(randomIndex);
-			drawCircle(layer, randomPoint.x, randomPoint.y, 2, Color.RED);
+		for (int i = 0; i < enemyDensity * (float) points.size() / (float) size; i++) {
+			p = points.get(rand.nextInt(points.size() - 1));
+			drawCircle(layer, p.x, p.y, 2, Color.RED);
 		}
 		layers.add(layer);
 
-
-//		layer = new Layer("Enemies", size, size);
-//		points = PointProcessor.get(level.getInterpolation(Level.HOSTILE), new PointProcessor.Predicate() {
-//			@Override
-//			public boolean matches(int x, int y, double value) {
-//				return (value > 0.0);
-//			}
-//		});
-//		for (int i = 0; i < 2 * (float) points.size() / (float) size; i++) {
-//			p = points.get(rand.nextInt(points.size() - 1));
-//			drawCircle(layer, p.x, p.y, 2, Color.RED);
-//		}
-//		layers.add(layer);
-//
-//		layer = new Layer("More Enemies", size, size);
-//		points = PointProcessor.get(level.getInterpolation(Level.HOSTILE), new PointProcessor.Predicate() {
-//			double v;
-//
-//			@Override
-//			public boolean matches(int x, int y, double value) {
-//				LevelConfiguration config = level.getConfig();
-//				float asteroidLow = config.getFloat("asteroidLow", 0.1f);
-//				float asteroidHi = config.getFloat("asteroidHi", 0.5f);
-//				float oreDepth = config.getFloat("oreDepth", 0.9f);
-//				float oreThresh = (asteroidHi - asteroidLow) * oreDepth / 2; // ore depth gives us the depth we need to
-//				if (value > 0.0) {
-//					v = level.getInterpolation(Level.ASTEROID)[x][y];
-//					return (v > asteroidLow + oreThresh && v < asteroidHi - oreThresh);
-//				}
-//				return false;
-//			}
-//		});
-//		for (int i = 0; i < 2 * (float) points.size() / (float) size; i++) {
-//			p = points.get(rand.nextInt(points.size() - 1));
-//			drawCircle(layer, p.x, p.y, 3, Color.RED.brighter());
-//		}
-//		layers.add(layer);
+		layer = new Layer("Ore", size, size);
+		points = PointProcessor.get(size, size, new PointProcessor.Predicate() {
+			double a, b;
+			@Override
+			public boolean match(int x, int y) {
+				a = level.getInterpolation(Level.ASTEROID)[x][y];
+				b = level.getInterpolation(Level.VALUE)[x][y];
+				if (a > asteroidLow + oreThresh && a < asteroidHi - oreThresh) {
+					// then we are in acceptable ore depth zone
+					return (b >= oreValue);
+				}
+				return false;
+			}
+		});
+		for (int i = 0; i < oreDensity * (float) points.size() / (float) size; i++) {
+			p = points.get(rand.nextInt(points.size() - 1));
+			drawCircle(layer, p.x, p.y, 3, Color.CYAN);
+		}
+		layers.add(layer);
 
 
 		long renderEnd = System.currentTimeMillis();
