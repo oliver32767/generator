@@ -26,6 +26,7 @@ public class Main {
 	private static MessageHandler messageHandler;
 	private static CheckBoxList layerList;
 	private static List<Layer> layers;
+	private static JMenuItem renderItem;
 
 	public static void main(String args[]) throws Exception {
 		// take the menu bar off the jframe
@@ -45,7 +46,7 @@ public class Main {
 		final JMenu actions = new JMenu("Actions");
 		actions.setMnemonic('A');
 
-		final JMenuItem renderItem = new JMenuItem("Render");
+		renderItem = new JMenuItem("Render");
 		renderItem.setMnemonic('R');
 		renderItem.setAccelerator(KeyStroke.getKeyStroke('R', KeyEvent.CTRL_DOWN_MASK));
 		renderItem.addActionListener(new ActionListener() {
@@ -213,6 +214,7 @@ public class Main {
 				try {
 
 					form.getButton().setEnabled(false);
+					renderItem.setEnabled(false);
 
 					Properties p = parsePropertiesString(form.getConfig().getText());
 					if (p.containsKey("seed")) {
@@ -240,6 +242,7 @@ public class Main {
 					}
 				} finally {
 					form.getButton().setEnabled(true);
+					renderItem.setEnabled(true);
 				}
 			}
 		};
