@@ -1,6 +1,6 @@
 package io.firstwave.generator.viewer;
 
-import io.firstwave.generator.renderer.LevelRenderer;
+import io.firstwave.generator.renderer.JoiseRenderer;
 import io.firstwave.generator.renderer.Renderer;
 import org.reflections.Reflections;
 
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * Created by waxwing on 1/31/14.
  */
 public class Main {
-	private static final String DEFAULT_RENDERER = LevelRenderer.class.getSimpleName();
+	private static final String DEFAULT_RENDERER = JoiseRenderer.class.getSimpleName();
 	private static int lastSeed = 0;
 	private static MainForm form;
 	private static RenderPanel renderPanel;

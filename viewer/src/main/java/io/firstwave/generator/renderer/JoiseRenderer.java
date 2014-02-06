@@ -1,9 +1,8 @@
 package io.firstwave.generator.renderer;
 
-import com.sudoplay.joise.module.ModuleAutoCorrect;
+import com.sudoplay.joise.Joise;
 import com.sudoplay.joise.module.ModuleBasisFunction;
 import com.sudoplay.joise.module.ModuleScaleDomain;
-import io.firstwave.generator.noise.Interpolator;
 import io.firstwave.generator.viewer.Layer;
 
 import java.util.ArrayList;
@@ -16,32 +15,24 @@ import java.util.Properties;
 public class JoiseRenderer extends Renderer {
 	@Override
 	public List<Layer> render(Properties properties) {
+
 		ModuleBasisFunction basis = new ModuleBasisFunction();
 		basis.setType(ModuleBasisFunction.BasisType.SIMPLEX);
 		basis.setSeed(42);
-
-		ModuleAutoCorrect correct = new ModuleAutoCorrect();
-		correct.setSource(basis);
-		correct.calculate();
+		basis.setInterpolation(ModuleBasisFunction.InterpolationType.CUBIC);
 
 		ModuleScaleDomain scaleDomain = new ModuleScaleDomain();
-		scaleDomain.setSource(correct);
-		scaleDomain.setScaleX(4.0);
-		scaleDomain.setScaleY(4.0);
+		scaleDomain.setSource(basis);
+		scaleDomain.setScaleX(0.003);
+		scaleDomain.setScaleY(0.003);
 
 		Layer layer = new Layer("Noise", 1000, 1000);
-		double [][] v = new double[100][100];
-		for (int y = 0; y < 100; y++) {
-			for (int x = 0; x < 100; x++) {
-				v[x][y] = scaleDomain.get(x, y);
 
-			}
-		}
-
-		double[][] iv = new double[1000][1000];
+		Joise j = new Joise(scaleDomain);
 		for (int y = 0; y < 1000; y++) {
 			for (int x = 0; x < 1000; x++) {
-				float i = (float) Interpolator.CUBIC.get(v, (float) x * 0.1f, (float) y * 0.1f);
+				float i = (float) j.get(x, y);
+				i = (i + 1.0f) * 0.5f;
 				layer.setRGB(x, y, color(1.0f, i, i, i));
 			}
 		}
