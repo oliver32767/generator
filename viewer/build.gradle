@@ -9,9 +9,17 @@ repositories {
     mavenCentral()
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.10'
+}
+
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile project(':library')
     compile 'com.intellij:forms_rt:7.0.3'
-    compile 'gov.nih.imagej:imagej:1.47'
+    compile 'org.reflections:reflections:0.9.9-RC1'
+
+    compile fileTree(
+            dir: 'libs',
+            include: '**/*.jar')
 }

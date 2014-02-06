@@ -1,4 +1,7 @@
-package io.firstwave.generator.viewer;
+package io.firstwave.generator.renderer;
+
+import io.firstwave.generator.viewer.Layer;
+import io.firstwave.generator.viewer.MessageHandler;
 
 import java.util.List;
 import java.util.Properties;
@@ -30,7 +33,7 @@ public abstract class Renderer {
 		return messageHandler;
 	}
 
-	public abstract List<Layer> render(Properties properties, MessageHandler messageHandler);
+	public abstract List<Layer> render(Properties properties);
 
 	protected int color(float a, float r, float g, float b) {
 		int aa = Math.round(255 * constrain(a));

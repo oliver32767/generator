@@ -9,7 +9,7 @@ public interface Level {
 	public final static int ASTEROID = 2;
 	public final static int VALUE = 3;
 
-	public LevelConfiguration getConfig();
+	public ImmutableConfiguration getConfig();
 
 	public double[][] getRawNoise(int type);
 

@@ -1,5 +1,9 @@
 package io.firstwave.generator.viewer;
 
+import io.firstwave.generator.renderer.LevelRenderer;
+import io.firstwave.generator.renderer.Renderer;
+import org.reflections.Reflections;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -20,6 +24,7 @@ import java.util.concurrent.TimeUnit;
  * Created by waxwing on 1/31/14.
  */
 public class Main {
+	private static final String DEFAULT_RENDERER = LevelRenderer.class.getSimpleName();
 	private static int lastSeed = 0;
 	private static MainForm form;
 	private static RenderPanel renderPanel;
@@ -27,6 +32,7 @@ public class Main {
 	private static CheckBoxList layerList;
 	private static List<Layer> layers;
 	private static JMenuItem renderItem;
+	private static Map<String, Class<? extends Renderer>> renderMap;
 
 	public static void main(String args[]) throws Exception {
 		// take the menu bar off the jframe
@@ -155,7 +161,16 @@ public class Main {
 			}
 		});
 
-		form.getRendererSelector().addItem("LevelRenderer");
+		renderMap = getRendererTypes();
+		for (String k : renderMap.keySet()) {
+			form.getRendererSelector().addItem(k);
+		}
+		for (int i = 0; i < form.getRendererSelector().getModel().getSize(); i++ ) {
+			if (form.getRendererSelector().getModel().getElementAt(i).equals(DEFAULT_RENDERER)) {
+				form.getRendererSelector().setSelectedIndex(i);
+				break;
+			}
+		}
 
 		form.getScrollPane().setViewportView(renderPanel);
 		form.getScrollPane().getViewport().setBackground(Color.BLACK);
@@ -223,11 +238,11 @@ public class Main {
 						lastSeed = new Random().nextInt();
 						p.setProperty("seed", String.valueOf(lastSeed));
 					}
-					Renderer renderer = getRenderer();
+					io.firstwave.generator.renderer.Renderer renderer = getRenderer();
 					messageHandler.setMessage(String.format(p.getProperty("ui.working", "%s started..."), renderer.getClass().getSimpleName()));
 
 
-					layers = getRenderer().render(p, messageHandler);
+					layers = getRenderer().render(p);
 					updateLayerList();
 					drawLayers();
 
@@ -252,6 +267,10 @@ public class Main {
 	static void updateLayerList() {
 		Vector<JCheckBox> chks = new Vector<JCheckBox>();
 		JCheckBox chk;
+		if (layers == null) {
+			layerList.setListData(chks);
+			return;
+		}
 		for (int i = 0; i < layers.size(); i++) {
 			chk = new JCheckBox(layers.get(i).getName());
 			if (i >= layerList.getModel().getSize()) {
@@ -278,11 +297,24 @@ public class Main {
 	}
 
 	static Renderer getRenderer() {
-		switch (form.getRendererSelector().getSelectedIndex()) {
-			case 0:
-			default:
-				return new LevelRenderer(messageHandler);
+		String type = (String) form.getRendererSelector().getModel().getElementAt(form.getRendererSelector().getSelectedIndex());
+		Class c = renderMap.get(type);
+		try {
+			return (Renderer) c.getConstructor(MessageHandler.class).newInstance(messageHandler);
+		} catch (Exception e) {
+			try {
+				return (Renderer) c.newInstance();
+			} catch (Exception ee) {
+				ee.printStackTrace();
+			}
+			e.printStackTrace();
 		}
+		return new Renderer() {
+			@Override
+			public List<Layer> render(Properties properties) {
+				return null;
+			}
+		};
 	}
 
 	static void reloadConfig() {
@@ -312,5 +344,15 @@ public class Main {
 				TimeUnit.MILLISECONDS.toSeconds(millis) -
 						TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)),
 				millis - TimeUnit.SECONDS.toMillis(TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))));
+	}
+
+	public static Map<String, Class<? extends Renderer>> getRendererTypes() {
+		Reflections r = new Reflections("io.firstwave.generator.renderer");
+		Set<Class<? extends Renderer>> rs = r.getSubTypesOf(Renderer.class);
+		Map<String, Class<? extends Renderer>> rv = new TreeMap<String, Class<? extends Renderer>>();
+		for (Class c : rs) {
+			rv.put(c.getSimpleName(), c);
+		}
+		return rv;
 	}
 }

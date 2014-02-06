@@ -8,21 +8,21 @@ import io.firstwave.generator.noise.*;
 public class LevelGenerator {
 
 
-	private final LevelConfiguration config;
+	private final ImmutableConfiguration config;
 
-	private LevelGenerator(LevelConfiguration config) {
+	private LevelGenerator(ImmutableConfiguration config) {
 		this.config = config;
 	}
 
-	public static LevelGenerator configure(LevelConfiguration config) {
+	public static LevelGenerator configure(ImmutableConfiguration config) {
 		return new LevelGenerator(config);
 	}
 
 	public Level generate() {
-		if (config.getInteger(LevelConfiguration.SEED) == null) {
+		if (!config.containsKey("seed")) {
 			throw new InvalidConfigurationException("seed cannot be null!");
 		}
-		int seed = config.getInteger(LevelConfiguration.SEED);
+		int seed = config.getInteger("seed");
 		float noiseScale = config.getFloat("noiseScale", 0.1f);
 		int size = config.getInteger("size", 1024);
 
@@ -73,7 +73,7 @@ public class LevelGenerator {
 		final int finalSeed = seed;
 		return new Level() {
 			@Override
-			public LevelConfiguration getConfig() {
+			public ImmutableConfiguration getConfig() {
 				return config;
 			}
 

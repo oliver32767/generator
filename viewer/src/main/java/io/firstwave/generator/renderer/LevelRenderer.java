@@ -1,16 +1,19 @@
-package io.firstwave.generator.viewer;
+package io.firstwave.generator.renderer;
 
-import io.firstwave.generator.Level;
-import io.firstwave.generator.LevelConfiguration;
-import io.firstwave.generator.LevelGenerator;
-import io.firstwave.generator.PointProcessor;
+import io.firstwave.generator.*;
+import io.firstwave.generator.viewer.ConfigurationUtil;
+import io.firstwave.generator.viewer.Layer;
+import io.firstwave.generator.viewer.Main;
+import io.firstwave.generator.viewer.MessageHandler;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import java.util.Random;
 
 /**
  * Created by waxwing on 2/1/14.
@@ -22,8 +25,8 @@ public class LevelRenderer extends Renderer {
 	}
 
 	@Override
-	public List<Layer> render(Properties properties, MessageHandler messageHandler) {
-		LevelConfiguration config = new LevelConfiguration(properties);
+	public List<Layer> render(Properties properties) {
+		Configuration config = ConfigurationUtil.fromProperties(properties);
 
 		// Level Generation
 		long genStart = System.currentTimeMillis();
@@ -170,7 +173,7 @@ public class LevelRenderer extends Renderer {
 
 		long renderEnd = System.currentTimeMillis();
 
-		messageHandler.setMessage(String.format("Generated: %s Rendered: %s Total: %s",
+		getMessageHandler().setMessage(String.format("Generated: %s Rendered: %s Total: %s",
 				Main.convertMillis(genEnd - genStart),
 				Main.convertMillis(renderEnd - renderStart),
 				Main.convertMillis(renderEnd - genStart)));
